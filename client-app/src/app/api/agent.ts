@@ -1,5 +1,4 @@
 import axios, {AxiosResponse} from 'axios';
-import { error } from 'node:console';
 import { Activity } from '../models/activity';
 
 //this method will add some sleep to our application
