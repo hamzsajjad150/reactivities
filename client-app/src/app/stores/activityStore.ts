@@ -1,7 +1,8 @@
 import { makeAutoObservable, runInAction } from "mobx";
 import agent from "../api/agent";
 import { Activity } from "../models/activity";
-import {v4 as uuid} from 'uuid';
+
+
 
 export default class ActivityStore {
   // creating key value pair
@@ -39,6 +40,7 @@ export default class ActivityStore {
 
   //this function sets the activities by fetching it from our api
   loadActivities = async () => {
+    this.loadingInitial = true;
     try {
       //getting the activities from our agent
       // anything after await is basaically another change in observable state
@@ -46,12 +48,7 @@ export default class ActivityStore {
       const activities = await agent.Activities.list();
 
       activities.forEach((activity) => {
-        activity.date = activity.date.split("T")[0];
-        // pushing each activities inside the local activities var to our observable activitiets
-        // mutating a state here (mutate means changeable in programing)
-        // in mobx we can and should mutate our obj
-        // this.activities.push(activity);
-        this.activityRegistry.set(activity.id, activity);
+       this.setActivity(activity);
       });
       this.setLoadingInitial(false);
     } catch (error) {
@@ -60,36 +57,57 @@ export default class ActivityStore {
     }
   };
 
+  //the function will load individual activity 
+  // it will find if the activity already is avaliable in the map obj
+  // if it is we set the selectedActivity of the whole app
+  // else we set the loading initial and get it from our API using the id
+  loadingActivity = async (id: string) => {
+    //if statement is if the activity exists in the map obj
+    let activity = this.getActivity(id);
+    if (activity) {
+      this.selectedActivity = activity;
+      return activity;
+    } else {
+      this.loadingInitial = true;
+      try {
+        activity = await agent.Activities.details(id);
+        this.setActivity(activity);
+        runInAction(() => {
+          this.selectedActivity = activity;
+        })
+        this.setLoadingInitial(false);
+        return activity;
+      } catch (error) {
+        console.log(error);
+        this.setLoadingInitial(false);
+      }
+    }
+  }
+
+  //this is a helper method to add an activity into the activities map obj
+  private setActivity = (activity: Activity) => {
+     activity.date = activity.date.split("T")[0];
+        // pushing each activities inside the local activities var to our observable activitiets
+        // mutating a state here (mutate means changeable in programing)
+        // in mobx we can and should mutate our obj
+        // this.activities.push(activity);
+        this.activityRegistry.set(activity.id, activity);
+  }
+
+  //this is a helper function to find if an activity exists
+  private getActivity = (id: string) => {
+    return this.activityRegistry.get(id);
+  }
+
   //create an action for ladingIntial observer
   setLoadingInitial = (state: boolean) => {
     this.loadingInitial = state;
   };
 
-  //this function manages the slection of 1 activity
-  selectActivity = (id: string) => {
-    this.selectedActivity = this.activityRegistry.get(id);
-  };
-
-  //this function cancel the selected activity (sets it back to undefind)
-  cancelSelectedActivity = () => {
-      this.selectedActivity = undefined;
-  }
-
-  // the functions opens the from
-  openForm = (id?: string) => {
-      id ? this.selectActivity(id) : this.cancelSelectedActivity();
-      this.editMode = true;
-  }
-
-  //this function close the from
-  closeForm = () => {
-      this.editMode = false;
-  }
 
   //this functions create the activity
   createActivity = async (activity: Activity) => {
     this.loading = true;
-    activity.id = uuid();
     try {
       await agent.Activities.create(activity);
       runInAction(() => {
@@ -133,8 +151,8 @@ export default class ActivityStore {
       runInAction(() => {
         this.activityRegistry.delete(id);
         //checking if the activity that is deleted was seleted
-        //?.id is accessing the id of the activity obj means if it has any
-        if(this.selectedActivity?.id === id) this.cancelSelectedActivity();
+        // //?.id is accessing the id of the activity obj means if it has any
+        // if(this.selectedActivity?.id === id) this.cancelSelectedActivity();
         this.loading = false;
       })
     } catch (error) {

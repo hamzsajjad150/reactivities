@@ -1,5 +1,6 @@
 import { observer } from 'mobx-react-lite';
 import React, { SyntheticEvent, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { Button, Item, Label, Segment } from 'semantic-ui-react';
 import { useStore } from '../../../app/stores/store';
 
@@ -37,7 +38,8 @@ export default observer(function ActivityList(){
                                 <div>{activity.city}, {activity.venue}</div>
                             </Item.Description>
                             <Item.Extra>
-                                <Button onClick={() => activityStore.selectActivity(activity.id)} floated='right' content='view' color='blue'/>
+                                {/* react route link is used instead of navlink because navlink adds style */}
+                                <Button as={Link} to={`/activities/${activity.id}`} floated='right' content='view' color='blue'/>
                                 <Button 
                                 // giving the name property to a button will make sure that
                                 // only this button gets the loading indicator
