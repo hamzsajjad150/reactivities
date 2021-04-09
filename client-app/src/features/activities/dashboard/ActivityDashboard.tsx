@@ -4,6 +4,7 @@ import ActivityList from './ActivityList';
 import { useStore } from '../../../app/stores/store';
 import { observer } from 'mobx-react-lite';
 import LoadingComponent from '../../../app/layout/LoadingComponent';
+import ActivityFilter from './ActivityFilters';
 
 
 // to accept the props from parent class we need to accpet that type in our function
@@ -128,7 +129,7 @@ export default observer(function ActivityDashboard(){
                 <ActivityDetails/>}
                 {editMode && 
                 <ActivityForm  />} */}
-                <h2>Activity Filters</h2>
+                <ActivityFilter />
             </Grid.Column>
         </Grid>
     )
