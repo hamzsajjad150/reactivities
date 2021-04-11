@@ -2,13 +2,17 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import 'semantic-ui-css/semantic.min.css';
 import './app/layout/styles.css';
-import 'react-calendar/dist/Calendar.css'
+import 'react-calendar/dist/Calendar.css';
+import 'react-toastify/dist/ReactToastify.min.css';
 import App from './app/layout/App';
 import reportWebVitals from './reportWebVitals';
 import { store, StoreContext } from './app/stores/store';
-import { BrowserRouter } from 'react-router-dom';
+import { Router } from 'react-router-dom';
+//importing createBrowserHistory that comes along with react route in the history
+import {createBrowserHistory} from 'history';
 
-
+//creating a history obj that can be used in our entire app
+export const history = createBrowserHistory();
 
 ReactDOM.render(
   //providing our context to our app 
@@ -16,9 +20,9 @@ ReactDOM.render(
   // we will provide it in this case as we want to provide it to our entire app
   // the provider takes in a value property with will be the entire observable with context interface such as store
   <StoreContext.Provider value={store}>
-    <BrowserRouter>
+    <Router history={history}>
     <App />
-    </BrowserRouter>
+    </Router>
   </StoreContext.Provider>,
   document.getElementById('root')
 );

@@ -3,10 +3,14 @@ import { Container } from "semantic-ui-react";
 import NavBar from "./NavBar";
 import ActivityDashboard from "../../features/activities/dashboard/ActivityDashboard";
 import { observer } from "mobx-react-lite";
-import { Route, useLocation } from "react-router";
+import { Route, Switch, useLocation } from "react-router";
 import HomePage from "../../features/home/HomePage";
 import ActivityForm from "../../features/activities/form/ActivityForm";
 import ActivityDetails from "../../features/activities/details/ActivityDetails";
+import TestErrors from "../../features/errors/TestError";
+import { ToastContainer } from "react-toastify";
+import NotFound from "../../features/errors/NotFound";
+import ServerError from "../../features/errors/ServerError";
 
 function App() {
   // //here we are using the useStore hook insde the store ts file
@@ -114,6 +118,8 @@ function App() {
         path={"/(.+)"}
         render={() => (
           <>
+          {/* adding a container for our toastify package so it can be displayed from anywhere in the app */}
+          <ToastContainer position='bottom-right' hideProgressBar/>
             <NavBar />
             <Container style={{ marginTop: "7em" }}>
               {/* this is the way you pass data from one components to another */}
@@ -122,7 +128,8 @@ function App() {
         inside our container */}
               {/* any thing outside of the container will always be displayed */}
               {/* the exact key word will only show the route if its exact same as the path */}
-
+              {/* using the switch that will only show the first route that matches */}
+              <Switch>
               <Route exact path="/activities" component={ActivityDashboard} />
               <Route path="/activities/:id" component={ActivityDetails} />
               {/* we can also specifc mutli path to one component */}
@@ -133,6 +140,12 @@ function App() {
                 path={["/createActivity", "/manage/:id"]}
                 component={ActivityForm}
               />
+              <Route path='/errors' component={TestErrors} />
+              <Route path='/server-error' component={ServerError} />
+              {/* this is the route that will be shown if the user trys to find a path that is not mentioned above */}
+              <Route component={NotFound} />
+              </Switch>
+              
             </Container>
           </>
         )}
