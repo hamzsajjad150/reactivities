@@ -28,7 +28,7 @@ namespace application.Activities
 
                 //checking if the acitiviiy is null
                 // we return null because the activity is null
-                // if(activity == null) return null;
+                 if(activity == null) return null;
 
                 _context.Remove(activity);
 

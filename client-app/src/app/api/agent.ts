@@ -1,5 +1,4 @@
 import axios, {AxiosResponse} from 'axios';
-import { error } from 'node:console';
 import { toast } from 'react-toastify';
 import { history } from '../..';
 import { Activity } from '../models/activity';

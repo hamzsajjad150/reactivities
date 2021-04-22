@@ -1,7 +1,7 @@
 import { makeAutoObservable, runInAction } from "mobx";
 import agent from "../api/agent";
 import { Activity } from "../models/activity";
-
+import { format } from 'date-fns';
 
 
 export default class ActivityStore {
@@ -10,7 +10,7 @@ export default class ActivityStore {
   selectedActivity: Activity | undefined = undefined;
   editMode = false;
   loading = false;
-  loadingInitial = true;
+  loadingInitial = false;
 
   //constructor for our class
   constructor() {
@@ -35,7 +35,7 @@ export default class ActivityStore {
   get activitiesByDate(){
     //creating a new array from the map and then sorting it with there date
     return Array.from(this.activityRegistry.values()).sort((a, b) => 
-                                                Date.parse(a.date) - Date.parse(b.date));
+                                                a.date!.getTime() - b.date!.getTime());
   }
 
   //this functions create an obj array of activities will grouping them together 
@@ -45,7 +45,7 @@ export default class ActivityStore {
       //grouping activities by date
       //we excute the reduce function on each element of the activities
       this.activitiesByDate.reduce((activities, activity) => {
-        const date = activity.date;
+        const date = format(activity.date!, 'dd MMM yyyy');
         //we will get the properties insde the activities that matches that date
         //we are checking if the activity of that date matches
         // explaination:
@@ -110,7 +110,7 @@ export default class ActivityStore {
 
   //this is a helper method to add an activity into the activities map obj
   private setActivity = (activity: Activity) => {
-     activity.date = activity.date.split("T")[0];
+     activity.date = new Date(activity.date!);
         // pushing each activities inside the local activities var to our observable activitiets
         // mutating a state here (mutate means changeable in programing)
         // in mobx we can and should mutate our obj
